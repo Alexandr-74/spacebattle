@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.spacebattle.entities.UObject;
 import ru.spacebattle.movement.Movement;
-import ru.spacebattle.movement.Turning;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,7 +52,7 @@ public class MainTest {
     @DisplayName("Ошибка поворота объекта")
     void test_movement_turning_error() {
         movement.position = null;
-        assertThrows(Exception.class, () -> movement.move(6, Turning.directionNumbers + 1), "Ошибка получения скорости объекта, скорость должна быть выше 0");
+        assertThrows(Exception.class, () -> movement.move(6, 8 + 1), "Ошибка получения скорости объекта, скорость должна быть выше 0");
         assertThrows(Exception.class, () -> movement.move(6, -1), "Ошибка поворота объекта, направление должно больше или равно 0 и меньше %s");
     }
 }
