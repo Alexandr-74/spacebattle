@@ -1,16 +1,17 @@
 package ru.spacebattle.entities;
 
+import ru.spacebattle.enums.UObjectProperties;
+
 import java.util.HashMap;
-import java.util.Map;
 
 public class UObject {
-    private final Map<String, Object> properties = new HashMap<>();
+    private final HashMap<UObjectProperties, Object> properties = new HashMap<>();
 
-    public HashMap<String, Object> getProperties() {
-        return new HashMap<>(properties);
+    public HashMap<UObjectProperties, Object> getProperties() {
+        return properties;
     }
 
-    public void setProperty(String key, Object value) {
+    public void setProperty(UObjectProperties key, Object value) {
         properties.put(key, value);
     }
 }

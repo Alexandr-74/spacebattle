@@ -1,4 +1,4 @@
-package ru.spacebattle.movement;
+package ru.spacebattle.commands;
 
 import ru.spacebattle.measures.Vector;
 
