@@ -1,15 +1,18 @@
-package ru.spacebattle.movement;
+package ru.spacebattle.commands;
 
 import ru.spacebattle.entities.UObject;
 import ru.spacebattle.measures.Vector;
 
-public class Turn implements Turnable {
+import static ru.spacebattle.enums.UObjectProperties.DIRECTION;
+import static ru.spacebattle.enums.UObjectProperties.DIRECTION_NUMBERS;
+
+public class TurnCommand implements Turnable {
 
     public final int directionNumbers = 8;
-    public Vector directionVector;
     private final UObject turnableObject;
+    public Vector directionVector;
 
-    public Turn(UObject turnObject) {
+    public TurnCommand(UObject turnObject) {
         this.turnableObject = turnObject;
         directionVector = new Vector(0, 0);
     }
@@ -22,8 +25,8 @@ public class Turn implements Turnable {
 
         directionVector = new Vector(xDirectionCalculation(direction), yDirectionCalculation(direction));
 
-        turnableObject.getProperties().put("Directon", directionVector);
-        turnableObject.getProperties().put("DirectonNumbers", directionNumbers);
+        turnableObject.setProperty(DIRECTION, directionVector);
+        turnableObject.setProperty(DIRECTION_NUMBERS, directionNumbers);
 
         return directionVector;
     }
