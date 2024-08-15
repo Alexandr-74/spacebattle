@@ -1,22 +1,25 @@
-package ru.spacebattle.movement;
+package ru.spacebattle.commands;
 
 import ru.spacebattle.entities.UObject;
+import ru.spacebattle.exception.TurnException;
 import ru.spacebattle.measures.Vector;
 
-public class Movement implements Movable {
+import static java.util.Optional.ofNullable;
+import static ru.spacebattle.enums.UObjectProperties.DIRECTION;
+import static ru.spacebattle.enums.UObjectProperties.VELOCITY;
 
-    public Vector position;
-    public Turn turn;
+public class MovementCommand implements Movable {
+
     private final UObject movableObject;
+    public Vector position;
 
-    public Movement(UObject movableObject) {
+    public MovementCommand(UObject movableObject) {
         this.movableObject = movableObject;
-        turn = new Turn(movableObject);
         position = new Vector(0, 0);
     }
 
     @Override
-    public Vector move(int velocity, int direction) throws Exception {
+    public Vector move(int velocity) throws Exception {
 
         if (position == null) {
             throw new Exception("Ошибка чтения позиции объекта");
@@ -26,8 +29,9 @@ public class Movement implements Movable {
             throw new Exception("Ошибка получения скорости объекта, скорость должна быть выше 0");
         }
 
-        movableObject.getProperties().put("Velocity", velocity);
-        Vector directionVector = turn.turn(direction);
+        Vector directionVector = (Vector) ofNullable(movableObject.getProperties().get(DIRECTION))
+                .orElseThrow(() -> new TurnException("Отсутствует направление движения", 404));
+        movableObject.setProperty(VELOCITY, velocity);
 
         Vector currentPosition = new Vector(
                 velocity * directionVector.x,
