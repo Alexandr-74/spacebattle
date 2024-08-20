@@ -3,7 +3,6 @@ package ru.spacebattle.commands.factory;
 import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 public class GenerateAdapterStrategyCommand {
 
