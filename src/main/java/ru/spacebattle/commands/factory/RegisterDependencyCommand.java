@@ -17,4 +17,9 @@ public class RegisterDependencyCommand {
         var currentScope = IoC.<Map<String, Function<Object[], Object>>>resolve(scope);
         currentScope.put(dependency, dependencyResolverStrategy);
     }
+
+    public void execute() {
+        var currentScope = IoC.<Map<String, Function<Object[], Object>>>resolve("IoC.Scope.Current");
+        currentScope.put(dependency, dependencyResolverStrategy);
+    }
 }

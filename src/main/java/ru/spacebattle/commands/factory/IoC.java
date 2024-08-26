@@ -29,6 +29,8 @@ public class IoC {
             } else {
                 return (T) new ResolveDependencyStrategyCommand(scopes.get(dependency)).resolve(String.valueOf(params[0]), Arrays.copyOfRange(params, 1, params.length));
             }
+        } else if ("Adapter".equals(dependency)) {
+            return (T) new GenerateAdapterStrategyCommand(scopes.get("IoC.Scope.Current")).resolve(dependency, params);
         } else {
             return (T) new ResolveDependencyStrategyCommand(scopes.get("IoC.Scope.Current")).resolve(dependency, params);
         }

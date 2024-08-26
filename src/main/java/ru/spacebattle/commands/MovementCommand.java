@@ -12,10 +12,12 @@ public class MovementCommand implements Movable {
 
     private final UObject movableObject;
     public Vector position;
+    public Integer velocity;
 
     public MovementCommand(UObject movableObject) {
         this.movableObject = movableObject;
         position = new Vector(0, 0);
+        velocity = 0;
     }
 
     @Override
@@ -32,6 +34,7 @@ public class MovementCommand implements Movable {
         Vector directionVector = (Vector) ofNullable(movableObject.getProperties().get(DIRECTION))
                 .orElseThrow(() -> new TurnException("Отсутствует направление движения", 404));
         movableObject.setProperty(VELOCITY, velocity);
+        this.velocity = velocity;
 
         Vector currentPosition = new Vector(
                 velocity * directionVector.x,
@@ -45,5 +48,10 @@ public class MovementCommand implements Movable {
 
     public Vector getPosition() {
         return position;
+    }
+
+    @Override
+    public Integer getVelocity() {
+        return velocity;
     }
 }
