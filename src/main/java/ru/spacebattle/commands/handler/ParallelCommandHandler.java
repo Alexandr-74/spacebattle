@@ -6,40 +6,33 @@ import ru.spacebattle.entities.Command;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-
-import static ru.spacebattle.enums.CommandEnum.HARD_STOP;
-import static ru.spacebattle.enums.CommandEnum.SOFT_STOP;
+import java.util.function.Predicate;
 
 public class ParallelCommandHandler {
 
     private BlockingQueue<Command> commandBlockingQueue;
     private List<Command> doneCommands;
-
     private  ExecutorService executor;
+    private Predicate<Object> executing;
 
     public ParallelCommandHandler(BlockingQueue<Command> commandBlockingQueue) {
         this.commandBlockingQueue = commandBlockingQueue;
+        executor = Executors.newCachedThreadPool();
+        doneCommands = new ArrayList<>();
     }
 
     public void execute() {
 
-        doneCommands = new ArrayList<>();
-        executor = Executors.newCachedThreadPool();
+        executing = (any) -> true;
 
         executor.execute(() -> {
             try {
 
-                while (!commandBlockingQueue.isEmpty()) {
+                while (executing.test(1)) {
                     Command command = commandBlockingQueue.take();
-                    if (HARD_STOP.equals(command.getCommandEnum())) {
-                        System.out.println("HARD_STOP");
-                        commandBlockingQueue.clear();
-                    } else if (SOFT_STOP.equals(command.getCommandEnum())) {
-                        System.out.println("SOFT_STOP");
-                        commandBlockingQueue = new LinkedBlockingQueue<>(commandBlockingQueue);
-                    } else {
-                        IoC.resolve(command.getCommandEnum().name(), command.getParams());
-                    }
+
+                    IoC.resolve(command.getCommandEnum().name(), command.getParams());
+
                     doneCommands.add(command);
                 }
             } catch (InterruptedException e) {
@@ -54,5 +47,13 @@ public class ParallelCommandHandler {
 
     ExecutorService getExecutor() {
         return executor;
+    }
+
+    BlockingQueue<Command> getQueue() {
+        return commandBlockingQueue;
+    }
+
+    void setExecuting(Predicate<Object> executing) {
+        this.executing = executing;
     }
 }
