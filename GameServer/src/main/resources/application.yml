@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: 'GameServer'
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: SpaceBattle
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.kafka.listener.ack-mode: MANUAL
+        spring.kafka.consumer.enable-auto-commit: false
+        allow.auto.create.topics: true
+      topic: 'space-battle-request-topic'
+
+    producer:
+      bootstrap-servers: localhost:9092
+      group-id: SpaceBattle
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        allow.auto.create.topics: true
+      topic: 'space-battle-response-topic'
+server:
+  port: 8081
