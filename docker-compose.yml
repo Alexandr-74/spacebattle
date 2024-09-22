@@ -1,0 +1,7 @@
+version: '3.0.1'
+
+services:
+  kafka:
+    image: bashj79/kafka-kraft
+    ports:
+      - 9092:9092

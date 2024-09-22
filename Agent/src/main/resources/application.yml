@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: 'agent'
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: SpaceBattle
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        allow.auto.create.topics: true
+      topic: 'space-battle-response-topic'
+    producer:
+      bootstrap-servers: localhost:9092
+      group-id: SpaceBattle
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        allow.auto.create.topics: true
+    topic: 'space-battle-request-topic'
