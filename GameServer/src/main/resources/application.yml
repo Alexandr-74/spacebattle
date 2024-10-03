@@ -13,6 +13,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     consumer:
       bootstrap-servers: localhost:9092
@@ -36,6 +37,7 @@ spring:
       topic: 'space-battle-response-topic'
 server:
   port: 8081
+
 
 token:
   signing:
