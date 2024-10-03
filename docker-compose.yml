@@ -1,6 +1,14 @@
 version: '3.0.1'
 
 services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: space-battle
+    ports:
+      - 5432:5432
   kafka:
     image: bashj79/kafka-kraft
     ports:

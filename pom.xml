@@ -19,6 +19,7 @@
         <module>Agent</module>
         <module>SpaceBattleLib</module>
         <module>GameServer</module>
+        <module>AuthorizationServer</module>
     </modules>
 
     <properties>

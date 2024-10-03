@@ -19,3 +19,10 @@ spring:
       properties:
         allow.auto.create.topics: true
     topic: 'space-battle-request-topic'
+
+
+agent:
+  authorizationServer:
+    url: localhost:8181
+  gameServer:
+    url: localhost:8081
