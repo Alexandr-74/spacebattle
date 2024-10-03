@@ -9,6 +9,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+      dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     properties:
       hibernate:
@@ -37,7 +38,6 @@ spring:
       topic: 'space-battle-response-topic'
 server:
   port: 8081
-
 
 token:
   signing:
