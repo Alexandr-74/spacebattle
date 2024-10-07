@@ -14,7 +14,10 @@ public class ParallelCommandHandler {
     private final BlockingQueue<Command> commandBlockingQueue;
     private final BlockingQueue<Command> doneCommands;
     private final ExecutorService executor;
+    private BlockingQueue<Command> backUpQueueBlockingQueue;
     private Predicate<Object> executing;
+
+    private CommandHandlerState currentState = new RunState();
 
     public ParallelCommandHandler(BlockingQueue<Command> commandBlockingQueue) {
         this.commandBlockingQueue = commandBlockingQueue;
@@ -23,26 +26,13 @@ public class ParallelCommandHandler {
     }
 
     public void execute() {
-
         executing = (any) -> true;
 
         executor.execute(() -> {
             try {
 
                 while (executing.test(1)) {
-                    Command command = commandBlockingQueue.take();
-                    System.out.println("Выполняется команда" + command.getCommandEnum());
-                    try {
-                        IoC.resolve(command.getCommandEnum().name(), command.getParams());
-                    } catch (Exception e) {
-                        Command errorCommand = new Command(command.getCommandEnum(), command.getParams());
-                        errorCommand.setMessage(e.getMessage());
-                        doneCommands.add(errorCommand);
-                        throw e;
-                    }
-
-                    command.setDone(true);
-                    doneCommands.add(command);
+                    currentState = currentState.executeCommand(commandBlockingQueue.take());
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -69,5 +59,73 @@ public class ParallelCommandHandler {
 
     public void setExecuting(Predicate<Object> executing) {
         this.executing = executing;
+    }
+
+    public BlockingQueue<Command> getBackUpQueueBlockingQueue() {
+        return backUpQueueBlockingQueue;
+    }
+
+    public void setBackUpQueueBlockingQueue(BlockingQueue<Command> backUpQueueBlockingQueue) {
+        this.backUpQueueBlockingQueue = backUpQueueBlockingQueue;
+    }
+
+    interface CommandHandlerState {
+        CommandHandlerState executeCommand(Command command);
+    }
+
+    private class RunState implements CommandHandlerState {
+
+        @Override
+        public CommandHandlerState executeCommand(Command command) {
+            System.out.println("Выполняется команда " + command.getCommandEnum());
+            try {
+                IoC.resolve(command.getCommandEnum().name(), command.getParams());
+            } catch (Exception e) {
+                Command errorCommand = new Command(command.getCommandEnum(), command.getParams());
+                errorCommand.setMessage(e.getMessage());
+                doneCommands.add(errorCommand);
+                throw e;
+            }
+
+            command.setDone(true);
+            doneCommands.add(command);
+
+            return switch (command.getCommandEnum()) {
+                case HARD_STOP -> new HardStopState();
+                case MOVE_TO -> new MoveToState();
+                default -> new RunState();
+            };
+        }
+    }
+
+    private class MoveToState implements CommandHandlerState {
+
+        @Override
+        public CommandHandlerState executeCommand(Command command) {
+            System.out.println("Перенос команды в очередь backup " + command.getCommandEnum());
+            if (backUpQueueBlockingQueue != null) {
+                try {
+                    backUpQueueBlockingQueue.put(command);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            return switch (command.getCommandEnum()) {
+                case HARD_STOP -> new HardStopState();
+                case RUN -> new RunState();
+                default -> new MoveToState();
+            };
+        }
+    }
+
+    private class HardStopState implements CommandHandlerState {
+
+        @Override
+        public CommandHandlerState executeCommand(Command command) {
+            System.out.println("Обработка команд остановлена, режим HARD_STOP");
+
+            return new HardStopState();
+        }
     }
 }
