@@ -7,11 +7,11 @@ public enum CommandEnum {
     STOP("stop"),
     UNDEFINED("undefined"),
     LOG("log"),
-
     HARD_STOP("hard_stop"),
-
     SOFT_STOP("soft_stop"),
-    REPEATE("repeate");
+    REPEATE("repeate"),
+    MOVE_TO("moveTo"),
+    RUN("run");
 
     private final String value;
 
