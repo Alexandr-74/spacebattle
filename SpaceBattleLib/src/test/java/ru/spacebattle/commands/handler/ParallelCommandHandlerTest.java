@@ -55,6 +55,12 @@ public class ParallelCommandHandlerTest {
                         "SOFT_STOP")
                 .execute();
 
+        IoC.<RegisterDependencyCommand>resolve("IoC.Register",
+                        (Object[] args) ->
+                                System.out.printf("%s command MOVE_TO %s%n", Thread.currentThread(), args.length != 0 ? args[0] : null),
+                        "MOVE_TO")
+                .execute();
+
     }
 
     @Test
@@ -123,5 +129,33 @@ public class ParallelCommandHandlerTest {
         commandHandler.getExecutor().shutdown();
         commandHandler.getExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         assertEquals(commandHandler.getDoneCommands().size(), 6);
+    }
+
+    @Test
+    @DisplayName("Проверка измнения состояния на moveTo")
+    void check_execute_moveTo_state() throws Exception {
+        BlockingQueue<Command> blockingQueue = new LinkedBlockingQueue<>();
+        BlockingQueue<Command> backupQueue = new LinkedBlockingQueue<>();
+
+        blockingQueue.put(new Command(CommandEnum.MOVE, 1));
+        blockingQueue.put(new Command(CommandEnum.TURN, new Vector(0, 1)));
+        blockingQueue.put(new Command(CommandEnum.FIRE));
+        blockingQueue.put(new Command(CommandEnum.MOVE, -1));
+
+
+        ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue);
+        commandHandler.setBackUpQueueBlockingQueue(backupQueue);
+        blockingQueue.put(new Command(CommandEnum.SOFT_STOP, commandHandler));
+        blockingQueue.put(new Command(CommandEnum.MOVE_TO));
+        blockingQueue.put(new Command(CommandEnum.FIRE));
+        blockingQueue.put(new Command(CommandEnum.TURN, new Vector(1, 1)));
+        commandHandler.execute();
+        blockingQueue.put(new Command(CommandEnum.MOVE, -5));
+        blockingQueue.put(new Command(CommandEnum.FIRE));
+
+        commandHandler.getExecutor().shutdown();
+        commandHandler.getExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        assertEquals(commandHandler.getDoneCommands().size(), 6);
+        assertEquals(backupQueue.size(), 4);
     }
 }
