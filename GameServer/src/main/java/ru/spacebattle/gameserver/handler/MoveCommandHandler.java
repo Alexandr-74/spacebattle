@@ -24,7 +24,7 @@ public class MoveCommandHandler implements CommandHandler {
                             this::moveHandle,
                             "MOVE")
                     .execute();
-            IoC.resolve(command.getCommandEnum().name(), command.getParams());
+            IoC.resolve(command.getAction().name(), command.getParams());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

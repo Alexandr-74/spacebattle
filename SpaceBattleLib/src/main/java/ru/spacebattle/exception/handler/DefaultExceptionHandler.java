@@ -9,6 +9,6 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
     @Override
     public void handle(Command cmd, Exception exception) throws InterruptedException {
-        System.out.printf("Залогировано исключение команды %s: %s%n", cmd.getCommandEnum(), exception.getMessage());
+        System.out.printf("Залогировано исключение команды %s: %s%n", cmd.getAction(), exception.getMessage());
     }
 }

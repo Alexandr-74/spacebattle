@@ -1,8 +1,9 @@
 package ru.spacebattle.gameserver.service;
 
 import ru.spacebattle.dto.InterpretCommandRequestDto;
+import ru.spacebattle.entities.Command;
 
 public interface InterpretCommandService {
 
-    void interpretCommand(InterpretCommandRequestDto interpretCommandRequestDto);
+    void interpretCommand(Command command);
 }

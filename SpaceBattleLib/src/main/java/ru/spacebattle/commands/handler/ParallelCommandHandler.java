@@ -2,7 +2,9 @@ package ru.spacebattle.commands.handler;
 
 import ru.spacebattle.commands.factory.IoC;
 import ru.spacebattle.entities.Command;
+import ru.spacebattle.enums.CommandEnum;
 
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,11 +79,11 @@ public class ParallelCommandHandler {
 
         @Override
         public CommandHandlerState executeCommand(Command command) {
-            System.out.println("Выполняется команда " + command.getCommandEnum());
+            System.out.println("Выполняется команда " + command.getAction());
             try {
-                IoC.resolve(command.getCommandEnum().name(), command.getParams());
+                IoC.resolve(command.getAction().name(), command.getParams());
             } catch (Exception e) {
-                Command errorCommand = new Command(command.getCommandEnum(), command.getParams());
+                Command errorCommand = new Command(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), command.getAction(), command.getParams());
                 errorCommand.setMessage(e.getMessage());
                 doneCommands.add(errorCommand);
                 throw e;
@@ -90,7 +92,7 @@ public class ParallelCommandHandler {
             command.setDone(true);
             doneCommands.add(command);
 
-            return switch (command.getCommandEnum()) {
+            return switch (command.getAction()) {
                 case HARD_STOP -> new HardStopState();
                 case MOVE_TO -> new MoveToState();
                 default -> new RunState();
@@ -102,7 +104,7 @@ public class ParallelCommandHandler {
 
         @Override
         public CommandHandlerState executeCommand(Command command) {
-            System.out.println("Перенос команды в очередь backup " + command.getCommandEnum());
+            System.out.println("Перенос команды в очередь backup " + command.getAction());
             if (backUpQueueBlockingQueue != null) {
                 try {
                     backUpQueueBlockingQueue.put(command);
@@ -111,7 +113,7 @@ public class ParallelCommandHandler {
                 }
             }
 
-            return switch (command.getCommandEnum()) {
+            return switch (command.getAction()) {
                 case HARD_STOP -> new HardStopState();
                 case RUN -> new RunState();
                 default -> new MoveToState();

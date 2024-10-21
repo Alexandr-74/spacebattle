@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import ru.spacebattle.dto.InterpretCommandRequestDto;
+import ru.spacebattle.entities.Command;
 
 import java.util.UUID;
 
@@ -15,13 +16,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BaseProducer {
 
-    private final KafkaTemplate<String, InterpretCommandRequestDto> kafkaTemplate;
+    private final KafkaTemplate<String, Command> kafkaTemplate;
 
     @Value("${spring.kafka.topic}")
     private String topic;
 
-    public void sendCommand(UUID key, InterpretCommandRequestDto interpretCommandRequestDto) {
-        log.info("Отправляю сообщение в очередь {}", interpretCommandRequestDto);
-        kafkaTemplate.send(topic, key.toString(), interpretCommandRequestDto);
+    public void sendCommand(Command command) {
+        log.info("Отправляю сообщение в очередь {}", command);
+        kafkaTemplate.send(topic, command);
     }
 }

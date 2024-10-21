@@ -9,6 +9,7 @@ import ru.spacebattle.entities.Command;
 import ru.spacebattle.enums.CommandEnum;
 import ru.spacebattle.measures.Vector;
 
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -69,17 +70,17 @@ public class ParallelCommandHandlerTest {
         BlockingQueue<Command> blockingQueue = new LinkedBlockingQueue<>();
 
 
-        blockingQueue.put(new Command(CommandEnum.MOVE, 1));
-        blockingQueue.put(new Command(CommandEnum.TURN, new Vector(0, 1)));
-        blockingQueue.put(new Command(CommandEnum.FIRE));
-        blockingQueue.put(new Command(CommandEnum.MOVE, -1));
-        blockingQueue.put(new Command(CommandEnum.FIRE));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, 1));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.TURN, new Vector(0, 1)));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(),  CommandEnum.FIRE));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(),  CommandEnum.MOVE, -1));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(),  CommandEnum.FIRE));
 
         Thread thread = new Thread(() -> {
             int i = 0;
             while (i < 500) {
                 try {
-                    blockingQueue.put(new Command(CommandEnum.MOVE, i++));
+                    blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, i++));
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -87,7 +88,7 @@ public class ParallelCommandHandlerTest {
         });
 
         ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue);
-        blockingQueue.put(new Command(CommandEnum.SOFT_STOP, commandHandler));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.SOFT_STOP, commandHandler));
         thread.start();
         commandHandler.execute();
 
@@ -102,17 +103,17 @@ public class ParallelCommandHandlerTest {
     void check_execute_parallel_hard() throws Exception {
         BlockingQueue<Command> blockingQueue = new LinkedBlockingQueue<>();
 
-        blockingQueue.put(new Command(CommandEnum.MOVE, 1));
-        blockingQueue.put(new Command(CommandEnum.TURN, new Vector(0, 1)));
-        blockingQueue.put(new Command(CommandEnum.FIRE));
-        blockingQueue.put(new Command(CommandEnum.MOVE, -1));
-        blockingQueue.put(new Command(CommandEnum.FIRE));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, 1));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(),CommandEnum.TURN, new Vector(0, 1)));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(),CommandEnum.FIRE));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, -1));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.FIRE));
 
         Thread thread = new Thread(() -> {
             int i = 0;
             while (i < 1000) {
                 try {
-                    blockingQueue.put(new Command(CommandEnum.MOVE, i++));
+                    blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, i++));
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -120,10 +121,10 @@ public class ParallelCommandHandlerTest {
         });
 
         ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue);
-        blockingQueue.put(new Command(CommandEnum.HARD_STOP, commandHandler));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.HARD_STOP, commandHandler));
         commandHandler.execute();
-        blockingQueue.put(new Command(CommandEnum.MOVE, -5));
-        blockingQueue.put(new Command(CommandEnum.FIRE));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, -5));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.FIRE));
 
         thread.start();
         commandHandler.getExecutor().shutdown();
@@ -137,21 +138,21 @@ public class ParallelCommandHandlerTest {
         BlockingQueue<Command> blockingQueue = new LinkedBlockingQueue<>();
         BlockingQueue<Command> backupQueue = new LinkedBlockingQueue<>();
 
-        blockingQueue.put(new Command(CommandEnum.MOVE, 1));
-        blockingQueue.put(new Command(CommandEnum.TURN, new Vector(0, 1)));
-        blockingQueue.put(new Command(CommandEnum.FIRE));
-        blockingQueue.put(new Command(CommandEnum.MOVE, -1));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, 1));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.TURN, new Vector(0, 1)));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.FIRE));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, -1));
 
 
         ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue);
         commandHandler.setBackUpQueueBlockingQueue(backupQueue);
-        blockingQueue.put(new Command(CommandEnum.SOFT_STOP, commandHandler));
-        blockingQueue.put(new Command(CommandEnum.MOVE_TO));
-        blockingQueue.put(new Command(CommandEnum.FIRE));
-        blockingQueue.put(new Command(CommandEnum.TURN, new Vector(1, 1)));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.SOFT_STOP, commandHandler));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE_TO));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.FIRE));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.TURN, new Vector(1, 1)));
         commandHandler.execute();
-        blockingQueue.put(new Command(CommandEnum.MOVE, -5));
-        blockingQueue.put(new Command(CommandEnum.FIRE));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, -5));
+        blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.FIRE));
 
         commandHandler.getExecutor().shutdown();
         commandHandler.getExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);

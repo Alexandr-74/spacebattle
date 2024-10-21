@@ -9,6 +9,8 @@ import ru.spacebattle.entities.Command;
 import ru.spacebattle.entities.UObject;
 import ru.spacebattle.enums.CommandEnum;
 
+import java.util.UUID;
+
 @ExtendWith(MockitoExtension.class)
 public class MoveCommandHandlerTest {
 
@@ -19,7 +21,7 @@ public class MoveCommandHandlerTest {
     void success_move_object() {
         UObject uObject = new UObject();
         Assertions.assertDoesNotThrow(() -> {
-            moveCommandHandler.handle(new Command(CommandEnum.MOVE, uObject, 1, -1));
+            moveCommandHandler.handle(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE,uObject, 1, -1));
         });
     }
 }
