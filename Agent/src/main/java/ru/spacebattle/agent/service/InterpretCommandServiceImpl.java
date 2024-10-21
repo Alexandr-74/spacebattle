@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.spacebattle.agent.kafka.producer.BaseProducer;
 import ru.spacebattle.dto.InterpretCommandRequestDto;
+import ru.spacebattle.entities.Command;
+import ru.spacebattle.enums.CommandEnum;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,7 +22,14 @@ public class InterpretCommandServiceImpl implements InterpretCommandService {
     public Optional<String> sendCommand(InterpretCommandRequestDto interpretCommandRequestDto) {
 
         try {
-            baseProducer.sendCommand(UUID.randomUUID(), interpretCommandRequestDto);
+            interpretCommandRequestDto.getCommandsList().stream()
+                    .map(commandDto -> new Command(
+                            UUID.randomUUID(),
+                            interpretCommandRequestDto.getPlayId(),
+                            interpretCommandRequestDto.getUObjectId(),
+                            CommandEnum.valueOf(commandDto.getCommandName()),
+                            commandDto.getArgs()))
+                    .forEach(baseProducer::sendCommand);
             return Optional.of("Команда отправлена на сервер");
         } catch (Exception e) {
             log.error("Ошибка помещения команды в очередь: {}", e.getMessage(), e);

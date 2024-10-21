@@ -22,22 +22,29 @@ import java.util.concurrent.LinkedBlockingQueue;
 @RequiredArgsConstructor
 public class InterpretCommandServiceImpl implements InterpretCommandService {
 
-    private final Map<Long, ParallelCommandHandler> gamesMap = new HashMap<>();
-    private final Map<Long, UObject> uObjectsMap = new HashMap<>();
+    private final Map<UUID, ParallelCommandHandler> gamesMap = new HashMap<>();
+    private final Map<UUID, UObject> uObjectsMap = new HashMap<>();
 
     private final BaseProducer baseProducer;
 
     @Override
-    public void interpretCommand(InterpretCommandRequestDto interpretCommandRequestDto) {
+    public void interpretCommand(Command command) {
 
         ParallelCommandHandler gameScope;
         try {
-            gameScope = gamesMap.getOrDefault(interpretCommandRequestDto.getPlayId(), initGame(interpretCommandRequestDto.getPlayId()));
+            gameScope = gamesMap.getOrDefault(command.getGameId(), initGame(command.getGameId()));
         } catch (Exception ex) {
-            throw new DefaultException(String.format("Ошибка поиска игры по id = %s", interpretCommandRequestDto.getPlayId()), 404);
+            throw new DefaultException(String.format("Ошибка поиска игры по id = %s", command.getGameId()), 404);
         }
 
-        gameScope.getQueue().addAll(mapToICommand(interpretCommandRequestDto));
+        command.setParams(new Object[]{
+                uObjectsMap.getOrDefault(
+                        command.getuObjectId(),
+                        new UObject()
+                        ),
+                command.getParams()});
+
+        gameScope.getQueue().add(command);
     }
 
     private void publish(ParallelCommandHandler parallelCommandHandler) {
@@ -46,14 +53,13 @@ public class InterpretCommandServiceImpl implements InterpretCommandService {
                 if (!parallelCommandHandler.getDoneCommands().isEmpty()) {
                     Command doneCommand = parallelCommandHandler.getDoneCommands().poll();
 
-
-                    log.info("публикуется выполненная команда " + doneCommand.getCommandEnum());
+                    log.info("публикуется выполненная команда " + doneCommand.getAction());
                     log.info("Параметры " + Arrays.toString(doneCommand.getParams()));
                     InterpretCommandResponseDto res;
                     if (doneCommand.isDone()) {
-                        res = new InterpretCommandResponseDto(String.format("Выполнена команда %s с параметрами %s", doneCommand.getCommandEnum(), doneCommand.getStringParams()));
+                        res = new InterpretCommandResponseDto(String.format("Выполнена команда %s с параметрами %s", doneCommand.getAction(), doneCommand.getStringParams()));
                     } else {
-                        res = new InterpretCommandResponseDto(String.format("Команда %s с параметрами %s не выполнена из за ошибки %s", doneCommand.getCommandEnum(), doneCommand.getStringParams(), doneCommand.getMessage()));
+                        res = new InterpretCommandResponseDto(String.format("Команда %s с параметрами %s не выполнена из за ошибки %s", doneCommand.getAction(), doneCommand.getStringParams(), doneCommand.getMessage()));
                     }
 
                     baseProducer.sendCommand(UUID.randomUUID(), res);
@@ -63,32 +69,7 @@ public class InterpretCommandServiceImpl implements InterpretCommandService {
 
     }
 
-    private List<Command> mapToICommand(InterpretCommandRequestDto interpretCommandRequestDto) {
-
-        return interpretCommandRequestDto.getCommandsList().stream().map(interpretCommandDto -> {
-                    CommandEnum commandEnum;
-                    UObject uObject;
-                    try {
-                        commandEnum = CommandEnum.valueOf(interpretCommandDto.getCommandName());
-                    } catch (IllegalArgumentException ex) {
-                        throw new DefaultException(String.format("Получена неизвестная команда %s", interpretCommandDto.getCommandName()), 500);
-                    }
-                    try {
-                        uObject = uObjectsMap.get(interpretCommandRequestDto.getUObjectId());
-                    } catch (IllegalArgumentException ex) {
-                        throw new DefaultException(String.format("Не найден объект выполнения команды %s", interpretCommandRequestDto.getUObjectId()), 404);
-                    }
-
-                    List<Object> params = new ArrayList<>();
-                    params.add(uObject);
-                    params.addAll(interpretCommandDto.getArgs());
-
-                    return new Command(commandEnum, params.toArray());
-                })
-                .toList();
-    }
-
-    private ParallelCommandHandler initGame(long playId) {
+    private ParallelCommandHandler initGame(UUID playId) {
         BlockingQueue<Command> queue = new LinkedBlockingQueue<>();
 
         ParallelCommandHandler parallelCommandHandler = new ParallelCommandHandler(queue);
