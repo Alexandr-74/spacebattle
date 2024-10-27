@@ -6,6 +6,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import ru.spacebattle.entities.Command;
 import ru.spacebattle.gameserver.service.InterpretCommandService;
 import ru.spacebattle.dto.InterpretCommandRequestDto;
 
@@ -18,10 +19,10 @@ public class InterpretCommandConsumerImpl implements InterpretCommandConsumer {
 
     @Override
     @KafkaListener(topics = "${spring.kafka.consumer.topic}")
-    public void consume(@Payload InterpretCommandRequestDto interpretCommandRequestDto, Acknowledgment acknowledgment) {
+    public void consume(@Payload Command command, Acknowledgment acknowledgment) {
         try {
-            log.info(String.format("Принято сообщение от агента %s", interpretCommandRequestDto));
-            interpretCommandService.interpretCommand(interpretCommandRequestDto);
+            log.info(String.format("Принято сообщение от агента %s", command));
+            interpretCommandService.interpretCommand(command);
         } catch (Exception ex) {
             log.error(String.format("Ошибка обработки команды %s", ex.getMessage()), ex);
         } finally {

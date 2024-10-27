@@ -34,7 +34,7 @@ public class CommandConsumerImpl implements CommandConsumer {
             try {
                 commandExecuter.executeCommand(command);
             } catch (Exception e) {
-                exceptionHandlers.getOrDefault(command.getCommandEnum(), new DefaultExceptionHandler()).handle(command, e);
+                exceptionHandlers.getOrDefault(command.getAction(), new DefaultExceptionHandler()).handle(command, e);
             }
         } while (!queue.isEmpty());
     }

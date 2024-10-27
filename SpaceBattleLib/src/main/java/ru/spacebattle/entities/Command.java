@@ -3,27 +3,36 @@ package ru.spacebattle.entities;
 import ru.spacebattle.enums.CommandEnum;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Command {
 
-    private final CommandEnum commandEnum;
+    private final UUID id;
 
-    private final Object[] params;
+    private final CommandEnum action;
+
+    private final UUID gameId;
+
+    private final UUID uObjectId;
+
+    private Object[] params;
     private String message;
 
     private boolean done = false;
     private int tries;
 
-    public Command(CommandEnum commandEnum, Object... params) {
+    public Command(UUID id, UUID gameId, UUID uObjectId, CommandEnum action,  Object... params) {
+        this.id = id;
+        this.gameId = gameId;
+        this.uObjectId = uObjectId;
         this.params = params;
-        this.commandEnum = commandEnum;
+        this.action = action;
         tries = 0;
     }
 
-    public CommandEnum getCommandEnum() {
-        return commandEnum;
+    public CommandEnum getAction() {
+        return action;
     }
 
 
@@ -57,5 +66,21 @@ public class Command {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    public UUID getGameId() {
+        return gameId;
+    }
+
+    public UUID getuObjectId() {
+        return uObjectId;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setParams(Object[] params) {
+        this.params = params;
     }
 }
