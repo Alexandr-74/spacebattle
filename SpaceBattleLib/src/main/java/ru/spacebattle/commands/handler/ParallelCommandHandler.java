@@ -81,12 +81,13 @@ public class ParallelCommandHandler {
         public CommandHandlerState executeCommand(Command command) {
             System.out.println("Выполняется команда " + command.getAction());
             try {
-                IoC.resolve(command.getAction().name(), command.getParams());
+                Command result = IoC.resolve(command.getAction().name(), command.getParams());
+                doneCommands.put(result);
             } catch (Exception e) {
                 Command errorCommand = new Command(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), command.getAction(), command.getParams());
                 errorCommand.setMessage(e.getMessage());
                 doneCommands.add(errorCommand);
-                throw e;
+                System.err.println("Ошибка при выполнении команды: " +e.getMessage());
             }
 
             command.setDone(true);

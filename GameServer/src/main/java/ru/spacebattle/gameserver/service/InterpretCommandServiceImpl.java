@@ -22,26 +22,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 @RequiredArgsConstructor
 public class InterpretCommandServiceImpl implements InterpretCommandService {
 
-    private final Map<UUID, ParallelCommandHandler> gamesMap = new HashMap<>();
-    private final Map<UUID, UObject> uObjectsMap = new HashMap<>();
 
+    private final GameService gameService;
     private final BaseProducer baseProducer;
 
     @Override
     public void interpretCommand(Command command) {
 
-        ParallelCommandHandler gameScope;
-        try {
-            gameScope = gamesMap.getOrDefault(command.getGameId(), initGame(command.getGameId()));
-        } catch (Exception ex) {
-            throw new DefaultException(String.format("Ошибка поиска игры по id = %s", command.getGameId()), 404);
-        }
+        ParallelCommandHandler gameScope = gameService.getGame(command.getGameId());
+        UObject uObject = gameService.getUObject(command.getGameId(), command.getuObjectId());
 
         command.setParams(new Object[]{
-                uObjectsMap.getOrDefault(
-                        command.getuObjectId(),
-                        new UObject()
-                        ),
+                uObject,
                 command.getParams()});
 
         gameScope.getQueue().add(command);
@@ -66,17 +58,5 @@ public class InterpretCommandServiceImpl implements InterpretCommandService {
                 }
             }
         });
-
-    }
-
-    private ParallelCommandHandler initGame(UUID playId) {
-        BlockingQueue<Command> queue = new LinkedBlockingQueue<>();
-
-        ParallelCommandHandler parallelCommandHandler = new ParallelCommandHandler(queue);
-        parallelCommandHandler.execute();
-        gamesMap.put(playId, parallelCommandHandler);
-        publish(parallelCommandHandler);
-
-        return parallelCommandHandler;
     }
 }

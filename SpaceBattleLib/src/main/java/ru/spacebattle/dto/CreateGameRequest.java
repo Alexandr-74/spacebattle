@@ -1,4 +1,4 @@
-package ru.spacebattle.agent.dto;
+package ru.spacebattle.dto;
 
 import lombok.Data;
 
@@ -11,4 +11,6 @@ public class CreateGameRequest {
     private String password;
 
     private List<UserPasswordDto> players;
+
+    private int spaceshipCount;
 }

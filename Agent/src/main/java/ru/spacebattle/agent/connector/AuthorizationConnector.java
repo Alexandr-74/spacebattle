@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.spacebattle.agent.dto.*;
+import ru.spacebattle.dto.CreateGameRequest;
 
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static ru.spacebattle.agent.constatnts.URLConstants.CREATE_GAME_AUTH_URL;
-import static ru.spacebattle.agent.constatnts.URLConstants.SIGN_UP_URL;
+import static ru.spacebattle.agent.constatnts.URLConstants.*;
 import static ru.spacebattle.agent.constatnts.URLParams.BASE_HOST;
 
 @Slf4j
@@ -53,6 +53,31 @@ public class AuthorizationConnector {
             restTemplate.postForEntity(host, entity, String.class);
 
             return new SuccessResponse("Registered");
+        } catch (Exception e) {
+            log.error("Auth error: {}", e.getMessage(), e);
+            return new ErrorResponse(e.getMessage());
+        }
+    }
+
+    public ResponseMessage signIn(SignUpRequest signUpRequest) {
+        try {
+            URI url = UriComponentsBuilder.fromUriString(SIGN_IN_URL)
+                    .build(Map.of(
+                            BASE_HOST, baseHost
+                    ));
+
+            String host = URLDecoder.decode(url.toString(), StandardCharsets.UTF_8);
+
+            String body = objectMapper.writeValueAsString(signUpRequest);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+            headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            HttpEntity<String> entity = new HttpEntity<>(body, headers);
+
+            restTemplate.postForEntity(host, entity, String.class);
+
+            return new SuccessResponse("SignedIn");
         } catch (Exception e) {
             log.error("Auth error: {}", e.getMessage(), e);
             return new ErrorResponse(e.getMessage());

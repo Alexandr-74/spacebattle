@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.spacebattle.agent.dto.JwtAuthenticationResponse;
+import ru.spacebattle.dto.CreateGameRequest;
 import ru.spacebattle.dto.CreateGameResponse;
 
 import java.net.URI;
@@ -30,7 +31,7 @@ public class GameServerConnector {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public CreateGameResponse createGame(JwtAuthenticationResponse jwtAuthenticationResponse) {
+    public CreateGameResponse createGame(JwtAuthenticationResponse jwtAuthenticationResponse, CreateGameRequest createGameRequest) {
 
         try {
             URI url = UriComponentsBuilder.fromUriString(CREATE_GAME_SERVER_URL)
@@ -45,9 +46,9 @@ public class GameServerConnector {
             headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
             headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             headers.set(HttpHeaders.AUTHORIZATION, BEARER_PREFIX.concat(jwtAuthenticationResponse.getToken()));
-            HttpEntity<String> entity = new HttpEntity<>(headers);
+            HttpEntity<CreateGameRequest> entity = new HttpEntity<>(createGameRequest, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(host, HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(host, HttpMethod.POST, entity, String.class);
 
             return objectMapper.readValue(response.getBody(), CreateGameResponse.class);
         } catch (Exception e) {

@@ -1,4 +1,4 @@
-package ru.spacebattle.agent.dto;
+package ru.spacebattle.dto;
 
 import lombok.Data;
 
