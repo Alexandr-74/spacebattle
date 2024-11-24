@@ -9,6 +9,7 @@ import ru.spacebattle.entities.Command;
 import ru.spacebattle.enums.CommandEnum;
 import ru.spacebattle.measures.Vector;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -21,27 +22,25 @@ public class ParallelCommandHandlerTest {
     @BeforeEach
     void setUp() throws Exception {
         IoC.<RegisterDependencyCommand>resolve("IoC.Register",
-                        (Object[] args) ->
-                                System.out.printf("%s command MOVE %s%n", Thread.currentThread(), args.length != 0 ? args[0] : null),
+                        (Object[] args) -> System.out.printf("%s command MOVE %s%n", Thread.currentThread(), args.length != 0 ? args[0] : null),
                         "MOVE")
                 .execute();
 
         IoC.<RegisterDependencyCommand>resolve("IoC.Register",
-                        (Object[] args) ->
-                                System.out.printf("%s command TURN %s%n", Thread.currentThread(), args.length != 0 ? args[0] : "no args"),
+                        (Object[] args) -> System.out.printf("%s command TURN %s%n", Thread.currentThread(), args.length != 0 ? args[0] : "no args"),
                         "TURN")
                 .execute();
 
         IoC.<RegisterDependencyCommand>resolve("IoC.Register",
-                        (Object[] args) ->
-                                System.out.printf("%s command FIRE %s%n", Thread.currentThread(), args.length != 0 ? args[0] : "no args"),
+                        (Object[] args) -> System.out.printf("%s command FIRE %s%n", Thread.currentThread(), args.length != 0 ? args[0] : "no args"),
                         "FIRE")
                 .execute();
 
         IoC.<RegisterDependencyCommand>resolve("IoC.Register",
                         (Object[] args) -> {
                             ((ParallelCommandHandler) args[0]).setExecuting((any) -> false);
-                            return System.out.printf("%s command HARD_STOP %s%n", Thread.currentThread(), args[0]);
+                            System.out.printf("%s command HARD_STOP %s%n", Thread.currentThread(), args[0]);
+                            return new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.HARD_STOP);
                         },
                         "HARD_STOP")
                 .execute();
@@ -51,14 +50,14 @@ public class ParallelCommandHandlerTest {
                         (Object[] args) -> {
                             ParallelCommandHandler commandHandler = ((ParallelCommandHandler) args[0]);
                             commandHandler.setExecuting((any) -> !commandHandler.getQueue().isEmpty());
-                            return System.out.printf("%s command SOFT_STOP %s%n", Thread.currentThread(), args[0]);
+                            System.out.printf("%s command SOFT_STOP %s%n", Thread.currentThread(), args[0]);
+                            return new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.SOFT_STOP);
                         },
                         "SOFT_STOP")
                 .execute();
 
         IoC.<RegisterDependencyCommand>resolve("IoC.Register",
-                        (Object[] args) ->
-                                System.out.printf("%s command MOVE_TO %s%n", Thread.currentThread(), args.length != 0 ? args[0] : null),
+                        (Object[] args) -> System.out.printf("%s command MOVE_TO %s%n", Thread.currentThread(), args.length != 0 ? args[0] : null),
                         "MOVE_TO")
                 .execute();
 
@@ -87,7 +86,7 @@ public class ParallelCommandHandlerTest {
             }
         });
 
-        ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue);
+        ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue, UUID.randomUUID());
         blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.SOFT_STOP, commandHandler));
         thread.start();
         commandHandler.execute();
@@ -120,7 +119,7 @@ public class ParallelCommandHandlerTest {
             }
         });
 
-        ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue);
+        ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue, UUID.randomUUID());
         blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.HARD_STOP, commandHandler));
         commandHandler.execute();
         blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, -5));
@@ -144,7 +143,7 @@ public class ParallelCommandHandlerTest {
         blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE, -1));
 
 
-        ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue);
+        ParallelCommandHandler commandHandler = new ParallelCommandHandler(blockingQueue, UUID.randomUUID());
         commandHandler.setBackUpQueueBlockingQueue(backupQueue);
         blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.SOFT_STOP, commandHandler));
         blockingQueue.put(new Command(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), CommandEnum.MOVE_TO));

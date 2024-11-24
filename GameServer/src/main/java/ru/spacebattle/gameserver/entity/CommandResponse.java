@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class CommandResponse extends Command {
 
-    public CommandResponse(CommandEnum commandEnum, Object... params) {
-        super(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), commandEnum, params);
+    public CommandResponse(CommandEnum commandEnum) {
+        super(UUID.randomUUID(), UUID.randomUUID(),UUID.randomUUID(), commandEnum);
     }
 }

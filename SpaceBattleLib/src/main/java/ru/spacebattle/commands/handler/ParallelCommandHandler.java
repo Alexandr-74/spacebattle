@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 public class ParallelCommandHandler {
 
+    private final UUID gameId;
     private final BlockingQueue<Command> commandBlockingQueue;
     private final BlockingQueue<Command> doneCommands;
     private final ExecutorService executor;
@@ -21,7 +22,8 @@ public class ParallelCommandHandler {
 
     private CommandHandlerState currentState = new RunState();
 
-    public ParallelCommandHandler(BlockingQueue<Command> commandBlockingQueue) {
+    public ParallelCommandHandler(BlockingQueue<Command> commandBlockingQueue, UUID gameId) {
+        this.gameId = gameId;
         this.commandBlockingQueue = commandBlockingQueue;
         executor = Executors.newCachedThreadPool();
         doneCommands = new LinkedBlockingQueue<>();
@@ -32,7 +34,6 @@ public class ParallelCommandHandler {
 
         executor.execute(() -> {
             try {
-
                 while (executing.test(1)) {
                     currentState = currentState.executeCommand(commandBlockingQueue.take());
                 }
@@ -71,6 +72,10 @@ public class ParallelCommandHandler {
         this.backUpQueueBlockingQueue = backUpQueueBlockingQueue;
     }
 
+    public UUID getGameId() {
+        return gameId;
+    }
+
     interface CommandHandlerState {
         CommandHandlerState executeCommand(Command command);
     }
@@ -83,10 +88,9 @@ public class ParallelCommandHandler {
             try {
                 IoC.resolve(command.getAction().name(), command.getParams());
             } catch (Exception e) {
-                Command errorCommand = new Command(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), command.getAction(), command.getParams());
+                Command errorCommand = new Command(command.getId(), command.getGameId(), command.getUObjectId(), command.getAction(), e.getMessage(), command.getParams());
                 errorCommand.setMessage(e.getMessage());
-                doneCommands.add(errorCommand);
-                throw e;
+                System.err.println("Ошибка при выполнении команды: " +e.getMessage());
             }
 
             command.setDone(true);

@@ -25,7 +25,7 @@ public class InterpretCommandServiceImpl implements InterpretCommandService {
             interpretCommandRequestDto.getCommandsList().stream()
                     .map(commandDto -> new Command(
                             UUID.randomUUID(),
-                            interpretCommandRequestDto.getPlayId(),
+                            interpretCommandRequestDto.getGameId(),
                             interpretCommandRequestDto.getUObjectId(),
                             CommandEnum.valueOf(commandDto.getCommandName()),
                             commandDto.getArgs()))

@@ -1,4 +1,4 @@
-package ru.spacebattle.gameserver.kafka.producer;
+package ru.spacebattle.gameprocessserver.kafka.producer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

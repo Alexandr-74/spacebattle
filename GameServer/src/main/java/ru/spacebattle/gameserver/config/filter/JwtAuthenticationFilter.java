@@ -36,9 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         var jwt = authHeader.substring(BEARER_PREFIX.length());
         var username = jwtService.extractUserName(jwt);
-        var gameId = jwtService.extractGameId(jwt);
 
-        if (StringUtils.isNotEmpty(username) && gameId != null) {
+        if (StringUtils.isNotEmpty(username)) {
 
             if (jwtService.isTokenValid(jwt)) {
                 filterChain.doFilter(request, response);

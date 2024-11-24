@@ -2,6 +2,7 @@ package ru.spacebattle.gameserver.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.spacebattle.dto.CreateGameRequest;
 import ru.spacebattle.dto.CreateGameResponse;
 import ru.spacebattle.gameserver.service.GameService;
 
@@ -12,9 +13,9 @@ public class GameController {
 
     private final GameService gameService;
 
-    @GetMapping("/create-game")
-    public CreateGameResponse createGameToken(@RequestHeader String authorization) {
-        return gameService.createGame(authorization);
+    @PostMapping("/create-game")
+    public CreateGameResponse createGameToken(@RequestHeader String authorization, @RequestBody CreateGameRequest createGameRequest) {
+        return gameService.createGame(createGameRequest);
     }
 
 }

@@ -9,6 +9,10 @@ services:
       POSTGRES_DB: space-battle
     ports:
       - 5432:5432
+  myServer:
+    image: someImage
+    ports:
+      - 5432:5432
   kafka:
     image: bashj79/kafka-kraft
     ports:
