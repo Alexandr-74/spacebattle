@@ -8,11 +8,6 @@ public class GameServerApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(GameServerApplication.class, args);
-        try {
-            GameCommandInitializer.initGameCommands();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

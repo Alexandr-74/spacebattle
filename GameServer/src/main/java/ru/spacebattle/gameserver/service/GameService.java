@@ -11,6 +11,4 @@ import java.util.UUID;
 public interface GameService {
 
     CreateGameResponse createGame(CreateGameRequest createGameRequest);
-    ParallelCommandHandler getGame(UUID gameId);
-    UObject getUObject(UUID gameId, UUID uObjectId);
 }

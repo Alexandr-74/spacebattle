@@ -5,16 +5,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.spacebattle.authorizationserver.dto.CreateGameRequest;
 import ru.spacebattle.authorizationserver.dto.JwtAuthenticationResponse;
 import ru.spacebattle.authorizationserver.dto.SignInRequest;
 import ru.spacebattle.authorizationserver.dto.SignUpRequest;
 import ru.spacebattle.authorizationserver.entity.User;
+import ru.spacebattle.dto.CreateGameRequest;
+import ru.spacebattle.dto.UserPasswordDto;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -54,17 +52,17 @@ public class AuthenticationService {
 
     public JwtAuthenticationResponse createGame(CreateGameRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
-                request.getPassword()
+                request.getUser().getUsername(),
+                request.getUser().getPassword()
         ));
 
         var user = userService
                 .userDetailsService()
-                .loadUserByUsername(request.getUsername());
+                .loadUserByUsername(request.getUser().getUsername());
 
         var jwt = jwtService.generateToken(user);
 
-        List<String> players = Stream.concat(request.getPlayers().stream().map(SignInRequest::getUsername), Stream.of(request.getUsername())).toList();
+        List<String> players = Stream.concat(request.getPlayers().stream().map(UserPasswordDto::getUsername), Stream.of(request.getUser().getUsername())).toList();
 
         userService.getAllByUsernames(players)
                         .forEach(usr -> {

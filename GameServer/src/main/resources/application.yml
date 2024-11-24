@@ -38,6 +38,8 @@ spring:
       topic: 'space-battle-response-topic'
 server:
   port: 8081
+  gameProcessServer:
+    url: localhost:8082
 
 token:
   signing:

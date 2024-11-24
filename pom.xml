@@ -20,6 +20,7 @@
         <module>SpaceBattleLib</module>
         <module>GameServer</module>
         <module>AuthorizationServer</module>
+        <module>GameProcessServer</module>
     </modules>
 
     <properties>

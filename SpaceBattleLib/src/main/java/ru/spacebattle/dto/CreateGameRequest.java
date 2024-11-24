@@ -6,9 +6,7 @@ import java.util.List;
 
 @Data
 public class CreateGameRequest {
-    private String username;
-
-    private String password;
+    private UserPasswordDto user;
 
     private List<UserPasswordDto> players;
 

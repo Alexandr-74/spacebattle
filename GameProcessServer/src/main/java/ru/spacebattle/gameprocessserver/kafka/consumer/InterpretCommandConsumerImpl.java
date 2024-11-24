@@ -1,4 +1,4 @@
-package ru.spacebattle.gameserver.kafka.consumer;
+package ru.spacebattle.gameprocessserver.kafka.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,8 +7,8 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.spacebattle.entities.Command;
-import ru.spacebattle.gameserver.service.InterpretCommandService;
-import ru.spacebattle.dto.InterpretCommandRequestDto;
+import ru.spacebattle.gameprocessserver.service.InterpretCommandService;
+
 
 @Slf4j
 @Component

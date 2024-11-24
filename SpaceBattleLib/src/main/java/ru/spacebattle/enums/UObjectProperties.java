@@ -6,9 +6,16 @@ public enum UObjectProperties {
     VELOCITY("Velocity"),
 
     POSITION("Position"),
+
+    IS_STOPPED("IsStopped"),
     TURN_VELOCITY_DELTA("TurnVelocityDelta"),
     FUEL_VOLUME("FuelVolume"),
-    BURN_FUEL_VELOCITY("BurnFuelVelocity");
+    BURN_FUEL_VELOCITY("BurnFuelVelocity"),
+    ID("id"),
+
+    GAME_ID("gameId"),
+    PLAYER_ID("playerId"),
+    PLAYER_NAME("playerName");
 
     private final String value;
 
